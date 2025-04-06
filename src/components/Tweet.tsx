@@ -1,26 +1,24 @@
 // src/components/Tweet.tsx
 import React, { useState, useEffect } from 'react';
-import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
-import { ITweet, IComment } from '../types';
+import { ITweet } from '../types';
 import { MessageSquare, Repeat, Share, Heart, HeartOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import CommentInput from './CommentInput';
-import Comment from './Comment';
+import { getDoc } from 'firebase/firestore';
+
 
 interface TweetProps {
   tweet: ITweet;
 }
 
 const Tweet: React.FC<TweetProps> = ({ tweet }) => {
-  const [isLiked, setIsLiked] = useState(tweet.isLiked || false);
+  const [isLiked, setIsLiked] = useState(false);
   const [isRetweeted, setIsRetweeted] = useState(tweet.isRetweeted || false);
-  const [likesCount, setLikesCount] = useState(tweet.likes);
+  const [likesCount, setLikesCount] = useState(0);
   const [retweetCount, setRetweetCount] = useState(tweet.retweetCount || 0);
   const [timeAgo, setTimeAgo] = useState('');
-  const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<IComment[]>([]);
 
   useEffect(() => {
     // Update time every minute
@@ -42,35 +40,47 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
   }, [tweet.createdAt]);
 
   useEffect(() => {
-    const tweetRef = doc(db, 'tweets', tweet.id);
-
-    const unsubscribe = onSnapshot(tweetRef, (doc) => {
-      const data = doc.data();
-      if (data && data.comments) {
-        setComments(data.comments);
-      } else {
-        setComments([]);
+    const fetchLikes = async () => {
+      if (auth.currentUser) {
+        const { uid } = auth.currentUser;
+        const tweetRef = doc(db, 'tweets', tweet.id);
+        // Check if the current user has liked the tweet
+        const tweetDoc = await getDoc(tweetRef);
+        if (tweetDoc.exists()) {
+          const tweetData = tweetDoc.data();
+          if (tweetData && tweetData.likes && tweetData.likes.includes(uid)) {
+            setIsLiked(true);
+          }
+          setLikesCount(tweetData.likes ? tweetData.likes.length : 0);
+        }
       }
-    });
+    };
 
-    return () => unsubscribe();
+    fetchLikes();
   }, [tweet.id]);
-
 
   const handleLike = async () => {
     if (!auth.currentUser) return;
 
     try {
+      const { uid } = auth.currentUser;
       const tweetRef = doc(db, 'tweets', tweet.id);
-      const newLikesCount = isLiked ? likesCount - 1 : likesCount + 1;
-      
-      await updateDoc(tweetRef, {
-        likes: newLikesCount,
-        isLiked: !isLiked
-      });
 
-      setIsLiked(!isLiked);
-      setLikesCount(newLikesCount);
+      if (isLiked) {
+        // Unlike the tweet
+        await updateDoc(tweetRef, {
+          likes: arrayRemove(uid)
+        });
+        setIsLiked(false);
+        setLikesCount(likesCount - 1);
+      } else {
+        // Like the tweet
+        await updateDoc(tweetRef, {
+          likes: arrayUnion(uid)
+        });
+        setIsLiked(true);
+        setLikesCount(likesCount + 1);
+      }
     } catch (error) {
       console.error("Erreur lors du like/unlike :", error);
     }
@@ -93,14 +103,6 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
     } catch (error) {
       console.error("Erreur lors du retweet :", error);
     }
-  };
-
-  const toggleComments = () => {
-    setShowComments(!showComments);
-  };
-
-  const handleCommentAdded = () => {
-    setShowComments(true);
   };
 
   return (
@@ -126,7 +128,7 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
       
       <div className="flex items-center justify-between mt-4">
         <div className="flex items-center space-x-6 text-gray-500">
-          <button onClick={toggleComments} className="flex items-center hover:text-blue-500 transition-colors">
+          <button className="flex items-center hover:text-blue-500 transition-colors">
             <MessageSquare size={18} />
           </button>
           
@@ -155,15 +157,6 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
           <span className="ml-1">{likesCount}</span>
         </button>
       </div>
-
-      {showComments && (
-        <div className="mt-4">
-          <CommentInput tweetId={tweet.id} onCommentAdded={handleCommentAdded} />
-          {comments.map((comment, index) => (
-            <Comment key={index} comment={comment} />
-          ))}
-        </div>
-      )}
     </div>
   );
 };

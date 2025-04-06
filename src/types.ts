@@ -9,13 +9,10 @@ export interface ITweet {
   text: string;
   displayName: string;
   createdAt: any;
-  likes: number;
   imageUrl?: string | null;
   userId: string;
   retweetCount: number;
-  isLiked?: boolean;
   isRetweeted?: boolean;
-  comments?: IComment[];
 }
 
 export interface IComment {

@@ -1,7 +1,7 @@
 // firebase.ts
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore,arrayUnion } from "firebase/firestore";
+import { getFirestore,arrayUnion ,getDoc} from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 
@@ -22,7 +22,7 @@ export const auth = getAuth();
 export const db = getFirestore(app);
 export const firestore = getFirestore(app);
 export const storage = getStorage(app);
-export { arrayUnion };
+export { arrayUnion,getDoc };
 
 
 export default app;
