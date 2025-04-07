@@ -6,6 +6,7 @@ import firebase from 'firebase/app';
 // src/types.ts
 export interface ITweet {
   id: string;
+  uid:string;
   text: string;
   displayName: string;
   username: string;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   doc,
+  getDoc,
   updateDoc,
   arrayUnion,
   arrayRemove,
@@ -9,8 +10,7 @@ import {
   onSnapshot,
   query,
   orderBy,
-  serverTimestamp,
-  getDoc
+  serverTimestamp
 } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
 import { ITweet } from '../types';
@@ -18,11 +18,20 @@ import { MessageSquare, Repeat, Share, Heart, HeartOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+// Interface pour les commentaires
 interface IComment {
   id: string;
   text: string;
   displayName: string;
   createdAt: any;
+}
+
+// Interface pour les infos utilisateur issues de la collection "users"
+interface IUser {
+  ID: string;
+  email: string | null;
+  fullname: string;
+  username: string;
 }
 
 interface TweetProps {
@@ -39,7 +48,34 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState<IComment[]>([]);
   const [showComments, setShowComments] = useState(false);
+  const [userInfo, setUserInfo] = useState<IUser | null>(null);
 
+  // Récupérer les infos de l'utilisateur depuis la collection "users"
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (tweet.uid) {
+        // Convertir tweet.uid en chaîne de caractères afin d'éviter des problèmes de type
+        const uidStr = tweet.uid.toString();
+        const userDocRef = doc(db, 'users', uidStr);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          setUserInfo(userDoc.data() as IUser);
+        } else if (auth.currentUser && auth.currentUser.uid === uidStr) {
+          // Fallback : utiliser les infos de auth.currentUser si le document n'existe pas
+          const { uid, displayName, email } = auth.currentUser;
+          setUserInfo({
+            ID: uid,
+            fullname: displayName || 'Utilisateur',
+            username: email ? email.split('@')[0] : 'unknown',
+            email
+          });
+        }
+      }
+    };
+    fetchUserInfo();
+  }, [tweet.uid]);
+
+  // Mise à jour du temps écoulé depuis la création
   useEffect(() => {
     const updateTime = () => {
       if (tweet.createdAt?.toDate) {
@@ -56,11 +92,12 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
     return () => clearInterval(interval);
   }, [tweet.createdAt]);
 
+  // Récupération des likes
   useEffect(() => {
     const fetchLikes = async () => {
       if (auth.currentUser) {
         const { uid } = auth.currentUser;
-        const tweetRef = doc(db, 'tweets', tweet.id);
+        const tweetRef = doc(db, 'tweets', tweet.id.toString());
         const tweetDoc = await getDoc(tweetRef);
         if (tweetDoc.exists()) {
           const tweetData = tweetDoc.data();
@@ -74,9 +111,10 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
     fetchLikes();
   }, [tweet.id]);
 
+  // Écoute des commentaires en temps réel
   useEffect(() => {
     const commentsQuery = query(
-      collection(db, 'tweets', tweet.id, 'comments'),
+      collection(db, 'tweets', tweet.id.toString(), 'comments'),
       orderBy('createdAt', 'asc')
     );
     const unsubscribe = onSnapshot(commentsQuery, (snapshot) => {
@@ -93,17 +131,13 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
     if (!auth.currentUser) return;
     try {
       const { uid } = auth.currentUser;
-      const tweetRef = doc(db, 'tweets', tweet.id);
+      const tweetRef = doc(db, 'tweets', tweet.id.toString());
       if (isLiked) {
-        await updateDoc(tweetRef, {
-          likes: arrayRemove(uid)
-        });
+        await updateDoc(tweetRef, { likes: arrayRemove(uid) });
         setIsLiked(false);
         setLikesCount(likesCount - 1);
       } else {
-        await updateDoc(tweetRef, {
-          likes: arrayUnion(uid)
-        });
+        await updateDoc(tweetRef, { likes: arrayUnion(uid) });
         setIsLiked(true);
         setLikesCount(likesCount + 1);
       }
@@ -115,7 +149,7 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
   const handleRetweet = async () => {
     if (!auth.currentUser) return;
     try {
-      const tweetRef = doc(db, 'tweets', tweet.id);
+      const tweetRef = doc(db, 'tweets', tweet.id.toString());
       const newRetweetCount = isRetweeted ? retweetCount - 1 : retweetCount + 1;
       await updateDoc(tweetRef, {
         retweetCount: newRetweetCount,
@@ -132,10 +166,10 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
     e.preventDefault();
     if (!auth.currentUser || !commentText.trim()) return;
     try {
-      await addDoc(collection(db, 'tweets', tweet.id, 'comments'), {
+      await addDoc(collection(db, 'tweets', tweet.id.toString(), 'comments'), {
         text: commentText,
         displayName: auth.currentUser.displayName,
-        createdAt: serverTimestamp(),
+        createdAt: serverTimestamp()
       });
       setCommentText('');
       setIsCommenting(false);
@@ -149,14 +183,21 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
     <div className="bg-white p-4 shadow-md rounded-lg mb-4 max-w-xl mx-auto">
       <div className="flex items-start mb-3">
         <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">
-          {tweet.displayName?.charAt(0).toUpperCase()}
+          {userInfo
+            ? userInfo.fullname.charAt(0).toUpperCase()
+            : tweet.displayName?.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1">
           <div className="flex items-baseline gap-2">
-            <h4 className="font-bold text-lg text-gray-900">{tweet.displayName}</h4>
-            <span className="text-base text-gray-900">@{tweet.username}</span>
-            <span className="text-sm text-gray-500">·</span>
-            <span className="text-sm text-gray-500">{timeAgo}</span>
+            <h4 className="font-bold text-lg text-gray-900">
+              {userInfo ? userInfo.fullname : tweet.displayName}
+            </h4>
+            {(userInfo?.username || tweet.username) && (
+              <span className="text-base text-gray-900">
+                @{userInfo ? userInfo.username : tweet.username}
+              </span>
+            )}
+            <span className="text-sm text-gray-500">· {timeAgo}</span>
           </div>
         </div>
       </div>
