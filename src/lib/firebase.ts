@@ -1,11 +1,10 @@
-// firebase.ts
+// src/lib/firebase.ts
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore,arrayUnion } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-
-// Configuration Firebase avec Vite (accès via import.meta.env)
+// Configuration Firebase via les variables d'environnement (Vite)
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -15,14 +14,10 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Initialiser Firebase
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth();
 export const db = getFirestore(app);
-export const firestore = getFirestore(app);
 export const storage = getStorage(app);
-export { arrayUnion };
-
 
 export default app;

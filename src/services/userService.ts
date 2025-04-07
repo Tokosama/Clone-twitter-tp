@@ -1,5 +1,5 @@
-// services/userService.ts
-import {User} from "../types";
+// src/services/userService.ts
+import { User } from "../types";
 import { collection, getDocs, doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
@@ -7,9 +7,10 @@ import { db } from "../lib/firebase";
 export const getUsers = async (): Promise<User[]> => {
   const usersCollectionRef = collection(db, "users");
   const querySnapshot = await getDocs(usersCollectionRef);
+
   const users: User[] = querySnapshot.docs.map((docSnapshot) => {
     return {
-      id: docSnapshot.id, // l'ID du document est une chaîne de caractères
+      id: docSnapshot.id, // L'ID Firestore est une chaîne
       ...docSnapshot.data(),
     } as unknown as User;
   });
@@ -23,10 +24,8 @@ export const toggleFollow = async (id: string): Promise<User[]> => {
 
   if (userDoc.exists()) {
     const userData = userDoc.data();
-    // Bascule la valeur de isFollowing pour cet utilisateur
     const newIsFollowing = !userData.isFollowing;
     await updateDoc(userDocRef, { isFollowing: newIsFollowing });
   }
-  // Retourne la liste mise à jour des utilisateurs
   return getUsers();
 };

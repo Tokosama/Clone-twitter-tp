@@ -1,9 +1,10 @@
-import UserItem from "./UserItem";
+// src/components/UserList.tsx
+import UserItem from "./UserItem"; 
 import { User } from "../types";
 
 type Props = {
   users: User[];
-  onToggleFollow: (id: number) => void;
+  onToggleFollow: (id: string) => void;
 };
 
 const UserList = ({ users, onToggleFollow }: Props) => {

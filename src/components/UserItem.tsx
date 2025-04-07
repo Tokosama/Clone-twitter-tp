@@ -1,8 +1,9 @@
-import { User } from "../types";
+// src/components/UserItem.tsx
+import { User } from "../types"; 
 
 type Props = {
   user: User;
-  onToggleFollow: (id: number) => void;
+  onToggleFollow: (id: string) => void;
 };
 
 const UserItem = ({ user, onToggleFollow }: Props) => {
@@ -13,7 +14,7 @@ const UserItem = ({ user, onToggleFollow }: Props) => {
         <p>{user.fullName}</p>
       </div>
       <button
-        onClick={() => onToggleFollow(user.id)}
+        onClick={() => onToggleFollow(String(user.id))}
         className={`btn ${user.isFollowing ? "btn-error" : "btn-primary"} text-white`}
       >
         {user.isFollowing ? "Unfollow" : "Follow"}
