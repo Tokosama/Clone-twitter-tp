@@ -8,6 +8,8 @@ export interface ITweet {
   id: string;
   text: string;
   displayName: string;
+  username: string;
+  likes: number;
   createdAt: any;
   imageUrl?: string | null;
   userId: string;

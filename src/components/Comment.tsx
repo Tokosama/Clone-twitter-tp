@@ -22,7 +22,7 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
           <span className="text-xs text-gray-500">{timeAgo}</span>
         </div>
       </div>
-      <p className="text-gray-700 text-sm mt-1">{comment.text}</p>
+      <p className="text-gray-900 text-sm mt-1">{comment.text}</p>
     </div>
   );
 };
