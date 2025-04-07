@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { auth } from "../lib/firebase";
 import { Loader2 } from "lucide-react";
+import TweetInput from "../components/TweetInput";
+import NewsFeed from "../components/NewsFeed";
 
 export const HomePage = () => {
   const [isLoggingOut, setLoggingOut] = useState(false);
@@ -16,22 +18,36 @@ export const HomePage = () => {
       setLoggingOut(false);
     }
   }
+
   return (
-    <div className="w-screen h-screen flex justify-center align-middle items-center ">
-      HomePage
-      <button
-        className="btn btn-primary"
-        onClick={Loggout}
-      >
-       {isLoggingOut ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                "Log Out"
-              )}
-      </button>
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-md py-3 px-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <h1 className="text-xl font-bold text-blue-500">Twitter Clone</h1>
+        </div>
+        <button
+          onClick={Loggout}
+          className="flex items-center text-blue-500 hover:text-blue-700"
+        >
+          {isLoggingOut ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin mr-2" />
+              <span>Loading...</span>
+            </>
+          ) : (
+            "Log Out"
+          )}
+        </button>
+      </header>
+
+      {/* Contenu principal */}
+      <main className="max-w-2xl mx-auto p-4 space-y-4">
+        {/* Composant pour créer un tweet */}
+        <TweetInput />
+        {/* Fil d'actualité */}
+        <NewsFeed />
+      </main>
     </div>
   );
 };

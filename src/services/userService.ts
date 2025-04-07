@@ -1,5 +1,5 @@
 // services/userService.ts
-import { User } from "../types";
+import {User} from "../types";
 import { collection, getDocs, doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 

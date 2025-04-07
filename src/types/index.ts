@@ -1,7 +1,6 @@
 export interface User {
-    id: number;
-    username: string;
-    fullName: string;
-    isFollowing: boolean;
-  }
-  
+  id: number;           // ou string, selon ta logique
+  username: string;
+  fullName: string;
+  isFollowing: boolean;
+}
