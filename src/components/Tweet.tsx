@@ -208,7 +208,7 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
       </div>
 
       {tweet.text && (
-        <p className="text-gray-700 text-lg mt-2 break-words">{tweet.text}</p>
+        <p className="text-gray-400 text-lg mt-2 break-words">{tweet.text}</p>
       )}
 
       {tweet.imageUrl && (
