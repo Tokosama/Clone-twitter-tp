@@ -1,54 +1,37 @@
-# React + TypeScript + Vite
+#  Clone de Twitter – Groupe 2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+##  Tâches
 
-Currently, two official plugins are available:
+- **OROU-TOKO Sabi Anouar**  
+  - Mise en place du projet  
+  - Répartition des tâches  
+  - Mise en place du système d'authentification  
+  - Supervision du projet
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **BOTON Alceo**  
+  - Mise en place de la logique de tweet  
+  - Mise en page de la page d'accueil  
+  - Implémentation de la fonctionnalité de like de tweet  
+  - Mise en place du feed
 
-## Expanding the ESLint configuration
+- **KITIHOUN Simon**  
+  - Mise en place de la page utilisateurs  
+  - Mise en place de la fonctionnalité de recherche  
+  - Implémentation de la fonctionnalité de follow
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **HITOEMETO Emmanuel**  
+  - Interface de visualisation des comptes suivis par le compte connecté
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **HODONOU Aurel**  
+  - Mise en place de la page profil de l'utilisateur connecté  
+  - Liste des tweets de ce dernier
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## ⚠ Remarque
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+La gestion des images n'a pas été prise en compte, car le Firestore de Firebase qui stocke les fichiers est payant.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+##  Test
+
+Pour tester le projet, il vous faudra avoir le fichier `.env` pour la connexion à Firebase.
+
+Merci.
