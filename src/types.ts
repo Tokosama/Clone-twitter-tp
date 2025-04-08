@@ -1,5 +1,4 @@
 // src/types.ts
-import firebase from 'firebase/app';
 
 
 
@@ -11,7 +10,7 @@ export interface ITweet {
   displayName?: string;
   username: string;
   likes: number;
-  createdAt: any;
+  createdAt: Date;
   imageUrl?: string | null;
   userId: string;
   retweetCount: number;
@@ -21,9 +20,12 @@ export interface ITweet {
 export interface IComment {
   id: string;
   text: string;
+
   displayName: string;
   username: string; 
-  createdAt: any;
+ 
+  createdAt: Date;
+
 }
 
 export interface IUser {
@@ -32,3 +34,11 @@ export interface IUser {
   username: string;
 }
 
+
+// src/types.ts
+export interface User {
+  id: string;           // ID du document Firestore, toujours une chaîne
+  username: string;
+  fullName: string;
+  isFollowing: boolean;
+}

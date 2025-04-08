@@ -191,7 +191,7 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
   };
 
   return (
-    <div className="bg-white p-4 shadow-md rounded-lg mb-4 max-w-xl mx-auto">
+    <div className="border-y border-[#2f3336]  p-8 shadow-md rounded-lg   mx-auto">
       <div className="flex items-start mb-3">
         <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">
           {userInfo?.fullname?.charAt(0).toUpperCase() || 
@@ -208,6 +208,7 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
           </div>
         </div>
       </div>
+
 
       {tweet.text && (
         <p className="text-gray-900 text-lg mt-2 break-words whitespace-pre-wrap overflow-hidden">
@@ -250,10 +251,10 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
         
         <button
           onClick={handleLike}
-          className={`flex items-center space-x-1 ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
+          className={`flex items-center space-x-1 text-gray-500 ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
         >
           {isLiked ? <Heart size={18} fill="currentColor" /> : <HeartOff size={18} />}
-          {likesCount > 0 && <span>{likesCount}</span>}
+          {likesCount > 0 ?<span>{likesCount}</span>:<span>0</span>}
         </button>
       </div>
 
@@ -297,6 +298,7 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
             <div className="mt-2 space-y-3">
               {comments.map(comment => (
                 <div key={comment.id} className="flex items-start">
+
                   <div className="bg-gray-50 p-3 rounded-lg flex-1">
                     <div className="font-semibold text-gray-900">
                       @{comment.username}
