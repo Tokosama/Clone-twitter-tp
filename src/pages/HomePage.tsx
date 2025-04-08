@@ -23,7 +23,7 @@ export const HomePage = () => {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="b shadow-md py-3 px-4 flex items-center justify-between">
+      {/* <header className="b shadow-md py-3 px-4 flex items-center justify-between">
         <div className="flex items-center">
           <h1 className="text-xl font-bold text-blue-500">Twitter Clone</h1>
         </div>
@@ -40,7 +40,7 @@ export const HomePage = () => {
             "Log Out"
           )}
         </button>
-      </header>
+      </header> */}
 
       <Layout>
         <main className="max-w-2xl mx-auto p-4 space-y-4">

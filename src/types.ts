@@ -1,11 +1,9 @@
 // src/types.ts
 
-
-
 // src/types.ts
 export interface ITweet {
   id: string;
-  uid:string;
+  uid: string;
   text: string;
   displayName?: string;
   username: string;
@@ -30,11 +28,10 @@ export interface IUser {
   username: string;
 }
 
-
 // src/types.ts
 export interface User {
-  id: string;           // ID du document Firestore, toujours une chaîne
+  id: string; // ID du document Firestore, toujours une chaîne
   username: string;
-  fullName: string;
+  fullname: string;
   isFollowing: boolean;
 }
