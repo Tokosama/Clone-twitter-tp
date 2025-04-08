@@ -1,13 +1,37 @@
-Clone de twitter du Groupe 2
-Taches:
-  -OROU-TOKO Sabi Anouar : MIs en place du projet, repartition des taches, Mis en place du systemes d'auth, et supervisation du projet
-  -BOTON Alceo : Mis en place du la logique de tweet, mis en page de la page d'acceuil, implementation de la fonctionnalite de like de tweet, mis en place du feed
-  -KITIHOUN SIMON: Mis en place de la page users,mis en place de la fonctionnalite de recherche , implementation de la fonctionnalite de follow
-  -HITOEMETO Emmanuel:Interface de visualisation des compte qui sont follow par le comptes connecté
-  -HODONOU Aurel:Mis en place de la page profile de lutilisateur connectee, liste des tweets de ce dernier
+#  Clone de Twitter – Groupe 2
 
+##  Tâches
 
-La gestion des Images n'a pas ete prise en compte car le firestore de firebase qui stocke les files est payant,
-Pour tester le projet, il vous faudra avoir le .env pour la connexion a la firebase
+- **OROU-TOKO Sabi Anouar**  
+  - Mise en place du projet  
+  - Répartition des tâches  
+  - Mise en place du système d'authentification  
+  - Supervision du projet
 
-Merci,
+- **BOTON Alceo**  
+  - Mise en place de la logique de tweet  
+  - Mise en page de la page d'accueil  
+  - Implémentation de la fonctionnalité de like de tweet  
+  - Mise en place du feed
+
+- **KITIHOUN Simon**  
+  - Mise en place de la page utilisateurs  
+  - Mise en place de la fonctionnalité de recherche  
+  - Implémentation de la fonctionnalité de follow
+
+- **HITOEMETO Emmanuel**  
+  - Interface de visualisation des comptes suivis par le compte connecté
+
+- **HODONOU Aurel**  
+  - Mise en place de la page profil de l'utilisateur connecté  
+  - Liste des tweets de ce dernier
+
+## ⚠ Remarque
+
+La gestion des images n'a pas été prise en compte, car le Firestore de Firebase qui stocke les fichiers est payant.
+
+##  Test
+
+Pour tester le projet, il vous faudra avoir le fichier `.env` pour la connexion à Firebase.
+
+Merci.
