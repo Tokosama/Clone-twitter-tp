@@ -18,7 +18,6 @@ import { MessageSquare, Repeat, Share, Heart, HeartOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-// Interface pour les commentaires
 interface IComment {
   id: string;
   text: string;
@@ -26,12 +25,12 @@ interface IComment {
   createdAt: any;
 }
 
-// Interface pour les infos utilisateur issues de la collection "users"
 interface IUser {
   ID: string;
   email: string | null;
   fullname: string;
   username: string;
+  avatarUrl?: string;
 }
 
 interface TweetProps {
@@ -50,32 +49,39 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
   const [showComments, setShowComments] = useState(false);
   const [userInfo, setUserInfo] = useState<IUser | null>(null);
 
-  // Récupérer les infos de l'utilisateur depuis la collection "users"
   useEffect(() => {
     const fetchUserInfo = async () => {
-      if (tweet.uid) {
-        // Convertir tweet.uid en chaîne de caractères afin d'éviter des problèmes de type
-        const uidStr = tweet.uid.toString();
-        const userDocRef = doc(db, 'users', uidStr);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          setUserInfo(userDoc.data() as IUser);
-        } else if (auth.currentUser && auth.currentUser.uid === uidStr) {
-          // Fallback : utiliser les infos de auth.currentUser si le document n'existe pas
-          const { uid, displayName, email } = auth.currentUser;
-          setUserInfo({
-            ID: uid,
-            fullname: displayName || 'Utilisateur',
-            username: email ? email.split('@')[0] : 'unknown',
-            email
-          });
+      if (tweet.userId) {
+        try {
+          const userDocRef = doc(db, 'users', tweet.userId);
+          const userDoc = await getDoc(userDocRef);
+          
+          if (userDoc.exists()) {
+            setUserInfo(userDoc.data() as IUser);
+          } else if (auth.currentUser?.uid === tweet.userId) {
+            setUserInfo({
+              ID: auth.currentUser.uid,
+              fullname: auth.currentUser.displayName || 'Utilisateur',
+              username: auth.currentUser.email?.split('@')[0] || 'utilisateur',
+              email: auth.currentUser.email || null
+            });
+          } else {
+            setUserInfo({
+              ID: tweet.userId,
+              fullname: tweet.displayName || 'Utilisateur',
+              username: tweet.username || 'utilisateur',
+              email: null
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching user info:", error);
         }
       }
     };
-    fetchUserInfo();
-  }, [tweet.uid]);
 
-  // Mise à jour du temps écoulé depuis la création
+    fetchUserInfo();
+  }, [tweet.userId, tweet.displayName, tweet.username]);
+
   useEffect(() => {
     const updateTime = () => {
       if (tweet.createdAt?.toDate) {
@@ -92,90 +98,89 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
     return () => clearInterval(interval);
   }, [tweet.createdAt]);
 
-  // Récupération des likes
   useEffect(() => {
     const fetchLikes = async () => {
       if (auth.currentUser) {
-        const { uid } = auth.currentUser;
-        const tweetRef = doc(db, 'tweets', tweet.id.toString());
+        const tweetRef = doc(db, 'tweets', tweet.id);
         const tweetDoc = await getDoc(tweetRef);
+        
         if (tweetDoc.exists()) {
           const tweetData = tweetDoc.data();
-          if (tweetData && tweetData.likes && tweetData.likes.includes(uid)) {
-            setIsLiked(true);
-          }
-          setLikesCount(tweetData.likes ? tweetData.likes.length : 0);
+          setIsLiked(tweetData?.likes?.includes(auth.currentUser.uid) || false);
+          setLikesCount(tweetData?.likes?.length || 0);
         }
       }
     };
     fetchLikes();
   }, [tweet.id]);
 
-  // Écoute des commentaires en temps réel
   useEffect(() => {
     const commentsQuery = query(
-      collection(db, 'tweets', tweet.id.toString(), 'comments'),
+      collection(db, 'tweets', tweet.id, 'comments'),
       orderBy('createdAt', 'asc')
     );
+    
     const unsubscribe = onSnapshot(commentsQuery, (snapshot) => {
-      const commentsData: IComment[] = snapshot.docs.map(doc => ({
+      const commentsData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as IComment[];
       setComments(commentsData);
     });
+    
     return () => unsubscribe();
   }, [tweet.id]);
 
   const handleLike = async () => {
     if (!auth.currentUser) return;
+    
     try {
-      const { uid } = auth.currentUser;
-      const tweetRef = doc(db, 'tweets', tweet.id.toString());
+      const tweetRef = doc(db, 'tweets', tweet.id);
       if (isLiked) {
-        await updateDoc(tweetRef, { likes: arrayRemove(uid) });
-        setIsLiked(false);
-        setLikesCount(likesCount - 1);
+        await updateDoc(tweetRef, { likes: arrayRemove(auth.currentUser.uid) });
+        setLikesCount(prev => prev - 1);
       } else {
-        await updateDoc(tweetRef, { likes: arrayUnion(uid) });
-        setIsLiked(true);
-        setLikesCount(likesCount + 1);
+        await updateDoc(tweetRef, { 
+          likes: arrayUnion(auth.currentUser.uid) 
+        });
+        setLikesCount(prev => prev + 1);
       }
+      setIsLiked(!isLiked);
     } catch (error) {
-      console.error("Erreur lors du like/unlike :", error);
+      console.error("Error updating like:", error);
     }
   };
 
   const handleRetweet = async () => {
     if (!auth.currentUser) return;
+    
     try {
-      const tweetRef = doc(db, 'tweets', tweet.id.toString());
-      const newRetweetCount = isRetweeted ? retweetCount - 1 : retweetCount + 1;
+      const tweetRef = doc(db, 'tweets', tweet.id);
       await updateDoc(tweetRef, {
-        retweetCount: newRetweetCount,
+        retweetCount: isRetweeted ? retweetCount - 1 : retweetCount + 1,
         isRetweeted: !isRetweeted
       });
+      setRetweetCount(isRetweeted ? retweetCount - 1 : retweetCount + 1);
       setIsRetweeted(!isRetweeted);
-      setRetweetCount(newRetweetCount);
     } catch (error) {
-      console.error("Erreur lors du retweet :", error);
+      console.error("Error updating retweet:", error);
     }
   };
 
-  const handleCommentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth.currentUser || !commentText.trim()) return;
+    
     try {
-      await addDoc(collection(db, 'tweets', tweet.id.toString(), 'comments'), {
+      await addDoc(collection(db, 'tweets', tweet.id, 'comments'), {
         text: commentText,
-        displayName: auth.currentUser.displayName,
+        displayName: auth.currentUser.displayName || 'Anonyme',
         createdAt: serverTimestamp()
       });
       setCommentText('');
       setIsCommenting(false);
-      setShowComments(true);
     } catch (error) {
-      console.error("Erreur lors de l'ajout du commentaire :", error);
+      console.error("Error adding comment:", error);
     }
   };
 
@@ -183,20 +188,16 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
     <div className="bg-white p-4 shadow-md rounded-lg mb-4 max-w-xl mx-auto">
       <div className="flex items-start mb-3">
         <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">
-          {userInfo
-            ? userInfo.fullname.charAt(0).toUpperCase()
-            : tweet.displayName?.charAt(0).toUpperCase()}
+          {userInfo?.fullname?.charAt(0).toUpperCase() || 
+           tweet.displayName?.charAt(0).toUpperCase() || 
+           'U'}
         </div>
+        
         <div className="flex-1">
-          <div className="flex items-baseline gap-2">
-            <h4 className="font-bold text-lg text-gray-900">
-              {userInfo ? userInfo.fullname : tweet.displayName}
-            </h4>
-            {(userInfo?.username || tweet.username) && (
-              <span className="text-base text-gray-900">
-                @{userInfo ? userInfo.username : tweet.username}
-              </span>
-            )}
+          <div className="flex flex-wrap items-baseline gap-2">
+            <span className="text-sm text-gray-500">
+              @{userInfo?.username || tweet.username || "utilisateur"}
+            </span>
             <span className="text-sm text-gray-500">· {timeAgo}</span>
           </div>
         </div>
@@ -208,7 +209,7 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
         <div className="mt-3">
           <img
             src={tweet.imageUrl}
-            alt="Illustration du tweet"
+            alt="Tweet content"
             className="rounded-lg max-h-80 w-full object-cover"
           />
         </div>
@@ -223,27 +224,26 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
             <MessageSquare size={18} />
             {comments.length > 0 && <span className="ml-1">{comments.length}</span>}
           </button>
+          
           <button
             onClick={handleRetweet}
-            className={`flex items-center space-x-1 transition-colors ${
-              isRetweeted ? 'text-green-500' : 'hover:text-green-500'
-            }`}
+            className={`flex items-center space-x-1 ${isRetweeted ? 'text-green-500' : 'hover:text-green-500'}`}
           >
             <Repeat size={18} />
             {retweetCount > 0 && <span>{retweetCount}</span>}
           </button>
+          
           <button className="flex items-center hover:text-blue-600 transition-colors">
             <Share size={18} />
           </button>
         </div>
+        
         <button
           onClick={handleLike}
-          className={`flex items-center space-x-1 transition-colors ${
-            isLiked ? 'text-red-500' : 'hover:text-red-500'
-          }`}
+          className={`flex items-center space-x-1 ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
         >
           {isLiked ? <Heart size={18} fill="currentColor" /> : <HeartOff size={18} />}
-          <span className="ml-1">{likesCount}</span>
+          {likesCount > 0 && <span>{likesCount}</span>}
         </button>
       </div>
 
@@ -253,37 +253,48 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Ajouter un commentaire..."
-            className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
+            className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={2}
           />
-          <div className="flex justify-end mt-2">
+          <div className="flex justify-end mt-2 space-x-2">
+            <button
+              type="button"
+              onClick={() => setIsCommenting(false)}
+              className="px-4 py-2 rounded-full border border-gray-300"
+            >
+              Annuler
+            </button>
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-blue-500 text-white px-4 py-2 rounded-full font-semibold hover:bg-blue-600"
             >
-              Envoyer
+              Commenter
             </button>
           </div>
         </form>
       )}
 
-      <div className="mt-4">
-        <button
-          onClick={() => setShowComments(!showComments)}
-          className="text-blue-500 hover:underline"
-        >
-          {showComments ? "Masquer les commentaires" : "Afficher les commentaires"}
-        </button>
-      </div>
-
-      {showComments && (
-        <div className="mt-4 ml-8 border-l-2 border-gray-200 pl-4 space-y-2 max-h-60 overflow-y-auto">
-          {comments.map((comment) => (
-            <div key={comment.id} className="bg-gray-50 p-2 rounded-md">
-              <div className="font-semibold">{comment.displayName}</div>
-              <div className="text-gray-900 text-sm mt-1">{comment.text}</div>
+      {comments.length > 0 && (
+        <div className="mt-4">
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className="text-blue-500 hover:underline text-sm"
+          >
+            {showComments ? 'Masquer les commentaires' : `Afficher les commentaires (${comments.length})`}
+          </button>
+          
+          {showComments && (
+            <div className="mt-2 space-y-3">
+              {comments.map(comment => (
+                <div key={comment.id} className="flex items-start">
+                  <div className="bg-gray-50 p-3 rounded-lg flex-1">
+                    <div className="font-semibold">{comment.displayName}</div>
+                    <div className="text-gray-700 mt-1">{comment.text}</div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>

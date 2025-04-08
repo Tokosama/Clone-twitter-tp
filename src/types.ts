@@ -8,7 +8,7 @@ export interface ITweet {
   id: string;
   uid:string;
   text: string;
-  displayName: string;
+  displayName?: string;
   username: string;
   likes: number;
   createdAt: any;
@@ -23,5 +23,11 @@ export interface IComment {
   displayName: string;
   text: string;
   createdAt: any;
+}
+
+export interface IUser {
+  email: string;
+  fullname: string;
+  username: string;
 }
 

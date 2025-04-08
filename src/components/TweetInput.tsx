@@ -1,7 +1,6 @@
-// src/components/TweetInput.tsx
 import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import { Send, Image as ImageIcon } from 'lucide-react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '../lib/firebase';
 
@@ -32,12 +31,20 @@ const TweetInput: React.FC = () => {
     if (!tweet.trim() && !imageFile) return;
 
     if (auth.currentUser) {
-      const { uid, displayName } = auth.currentUser;
+      const { uid, displayName: authDisplayName, email } = auth.currentUser;
       let imageUrl: string | null = null;
       
       try {
         setIsUploading(true);
+
+        // Récupérer les informations de l'utilisateur
+        const userDoc = await getDoc(doc(db, 'users', uid));
+        const userData = userDoc.data();
         
+        // Déterminer le displayName à utiliser
+        const displayName = userData?.fullname || authDisplayName || 'Utilisateur';
+        const username = userData?.username || email?.split('@')[0] || 'utilisateur';
+
         if (imageFile) {
           const imageRef = ref(storage, `tweets/${uid}/${Date.now()}_${imageFile.name}`);
           const snapshot = await uploadBytes(imageRef, imageFile);
@@ -49,8 +56,10 @@ const TweetInput: React.FC = () => {
           createdAt: serverTimestamp(),
           userId: uid,
           displayName: displayName,
+          username: username,
           retweetCount: 0,
           imageUrl: imageUrl,
+          likes: [] // Initialiser un tableau vide pour les likes
         });
 
         setTweet('');
