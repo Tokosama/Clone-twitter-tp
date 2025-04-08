@@ -1,21 +1,28 @@
-import { useUsers } from "../hooks/useUsers";
-import SearchBar from "../components/SearchBar";
+// src/pages/UsersPage.tsx
+import React from "react";
 import UserList from "../components/UserList";
+import { useUsers } from "../hooks/useUsers";
 
-
-
-const UsersPage = () => {
+const UsersPage: React.FC = () => {
   const { users, loading, handleToggleFollow, setSearch } = useUsers();
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>Loading users...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Liste des utilisateurs</h2>
-      <SearchBar onSearch={setSearch} />
-      {loading ? (
-        <p className="text-center">Chargement...</p>
-      ) : (
-        <UserList users={users} onToggleFollow={handleToggleFollow} />
-      )}
+    <div className="p-4 max-w-2xl mx-auto">
+      <input 
+        type="text"
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search users"
+        className="border p-2 w-full mb-4"
+      />
+      <UserList users={users} onToggleFollow={handleToggleFollow} />
     </div>
   );
 };

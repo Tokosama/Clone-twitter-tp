@@ -1,3 +1,4 @@
+// src/hooks/useUsers.ts
 import { useEffect, useState } from "react";
 import { getUsers, toggleFollow } from "../services/userService";
 import { User } from "../types";
@@ -8,13 +9,14 @@ export const useUsers = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    getUsers().then((data) => {
+    (async () => {
+      const data = await getUsers();
       setUsers(data);
       setLoading(false);
-    });
+    })();
   }, []);
 
-  const handleToggleFollow = async (id: number) => {
+  const handleToggleFollow = async (id: string) => {
     const updated = await toggleFollow(id);
     setUsers(updated);
   };

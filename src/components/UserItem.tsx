@@ -1,11 +1,13 @@
+// src/components/UserItem.tsx
+import React from "react";
 import { User } from "../types";
 
 type Props = {
   user: User;
-  onToggleFollow: (id: number) => void;
+  onToggleFollow: (id: string) => void;
 };
 
-const UserItem = ({ user, onToggleFollow }: Props) => {
+const UserItem: React.FC<Props> = ({ user, onToggleFollow }) => {
   return (
     <div className="flex justify-between items-center border-b py-2">
       <div>

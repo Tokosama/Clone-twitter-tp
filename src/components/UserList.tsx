@@ -1,12 +1,14 @@
+// src/components/UserList.tsx
+import React from "react";
 import UserItem from "./UserItem";
 import { User } from "../types";
 
 type Props = {
   users: User[];
-  onToggleFollow: (id: number) => void;
+  onToggleFollow: (id: string) => void;
 };
 
-const UserList = ({ users, onToggleFollow }: Props) => {
+const UserList: React.FC<Props> = ({ users, onToggleFollow }) => {
   return (
     <div className="space-y-2">
       {users.map((user) => (
