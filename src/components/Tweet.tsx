@@ -22,6 +22,7 @@ interface IComment {
   id: string;
   text: string;
   displayName: string;
+  username: string;
   createdAt: any;
 }
 
@@ -40,7 +41,7 @@ interface TweetProps {
 const Tweet: React.FC<TweetProps> = ({ tweet }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isRetweeted, setIsRetweeted] = useState(tweet.isRetweeted || false);
-  const [likesCount, setLikesCount] = useState(0);
+  const [likesCount, setLikesCount] = useState(tweet.likes?.length || 0);
   const [retweetCount, setRetweetCount] = useState(tweet.retweetCount || 0);
   const [timeAgo, setTimeAgo] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
@@ -275,14 +276,14 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Ajouter un commentaire..."
-            className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
             rows={2}
           />
           <div className="flex justify-end mt-2 space-x-2">
             <button
               type="button"
               onClick={() => setIsCommenting(false)}
-              className="px-4 py-2 rounded-full border border-gray-300"
+              className="px-4 py-2 rounded-full border border-gray-300 text-gray-900"
             >
               Annuler
             </button>
