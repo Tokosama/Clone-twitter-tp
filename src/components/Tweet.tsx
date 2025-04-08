@@ -22,6 +22,7 @@ interface IComment {
   id: string;
   text: string;
   displayName: string;
+  username: string;
   createdAt: any;
 }
 
@@ -40,7 +41,7 @@ interface TweetProps {
 const Tweet: React.FC<TweetProps> = ({ tweet }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isRetweeted, setIsRetweeted] = useState(tweet.isRetweeted || false);
-  const [likesCount, setLikesCount] = useState(0);
+  const [likesCount, setLikesCount] = useState(tweet.likes?.length || 0);
   const [retweetCount, setRetweetCount] = useState(tweet.retweetCount || 0);
   const [timeAgo, setTimeAgo] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
@@ -138,12 +139,12 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
       const tweetRef = doc(db, "tweets", tweet.id);
       if (isLiked) {
         await updateDoc(tweetRef, { likes: arrayRemove(auth.currentUser.uid) });
-        setLikesCount((prev) => prev - 1);
+        setLikesCount((prev: number) => prev - 1);
       } else {
         await updateDoc(tweetRef, {
           likes: arrayUnion(auth.currentUser.uid),
         });
-        setLikesCount((prev) => prev + 1);
+        setLikesCount((prev: number) => prev + 1);
       }
       setIsLiked(!isLiked);
     } catch (error) {
@@ -172,10 +173,15 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
     if (!auth.currentUser || !commentText.trim()) return;
 
     try {
-      await addDoc(collection(db, "tweets", tweet.id, "comments"), {
+      const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+      const userData = userDoc.data();
+      
+      await addDoc(collection(db, 'tweets', tweet.id, 'comments'), {
         text: commentText,
-        displayName: auth.currentUser.displayName || "Anonyme",
-        createdAt: serverTimestamp(),
+        username: userData?.username || 
+                auth.currentUser.email?.split('@')[0] || 
+                'utilisateur',
+        createdAt: serverTimestamp()
       });
       setCommentText("");
       setIsCommenting(false);
@@ -275,14 +281,14 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Ajouter un commentaire..."
-            className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
             rows={2}
           />
           <div className="flex justify-end mt-2 space-x-2">
             <button
               type="button"
               onClick={() => setIsCommenting(false)}
-              className="px-4 py-2 rounded-full border border-gray-300"
+              className="px-4 py-2 rounded-full border border-gray-300 text-gray-900"
             >
               Annuler
             </button>
@@ -309,13 +315,13 @@ const Tweet: React.FC<TweetProps> = ({ tweet }) => {
 
           {showComments && (
             <div className="mt-2 space-y-3">
-              {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="flex items-start"
-                >
-                  <div className="border border-[#2f3336] p-3 rounded-lg flex-1">
-                    <div className="font-semibold">{comment.displayName}</div>
+              {comments.map(comment => (
+                <div key={comment.id} className="flex items-start">
+
+                  <div className="bg-gray-50 p-3 rounded-lg flex-1">
+                    <div className="font-semibold text-gray-900">
+                      @{comment.username}
+                    </div>
                     <div className="text-gray-700 mt-1">{comment.text}</div>
                   </div>
                 </div>
