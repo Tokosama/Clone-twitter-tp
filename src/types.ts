@@ -18,10 +18,14 @@ export interface ITweet {
 }
 
 export interface IComment {
-  userId: string;
-  displayName: string;
+  id: string;
   text: string;
+
+  displayName: string;
+  username: string; 
+ 
   createdAt: Date;
+
 }
 
 export interface IUser {
