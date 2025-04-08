@@ -1,3 +1,4 @@
+// src/components/TweetInput.tsx
 import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import { Send, Image as ImageIcon } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -48,10 +49,7 @@ const TweetInput: React.FC = () => {
           createdAt: serverTimestamp(),
           userId: uid,
           displayName: displayName,
-          likes: 0,
           retweetCount: 0,
-          isLiked: false,
-          isRetweeted: false,
           imageUrl: imageUrl,
         });
 
@@ -71,7 +69,7 @@ const TweetInput: React.FC = () => {
         value={tweet}
         onChange={(e) => setTweet(e.target.value)}
         placeholder="Quoi de neuf ?"
-        className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
         rows={3}
       />
       
