@@ -25,7 +25,7 @@ const NewsFeed: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div className="">
       {tweets.map(tweet => (
         <Tweet key={tweet.id} tweet={tweet} />
       ))}

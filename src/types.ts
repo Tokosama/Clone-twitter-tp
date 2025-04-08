@@ -1,5 +1,4 @@
 // src/types.ts
-import firebase from 'firebase/app';
 
 
 
@@ -11,7 +10,7 @@ export interface ITweet {
   displayName?: string;
   username: string;
   likes: number;
-  createdAt: any;
+  createdAt: Date;
   imageUrl?: string | null;
   userId: string;
   retweetCount: number;
@@ -22,7 +21,7 @@ export interface IComment {
   userId: string;
   displayName: string;
   text: string;
-  createdAt: any;
+  createdAt: Date;
 }
 
 export interface IUser {

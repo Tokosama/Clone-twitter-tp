@@ -1,11 +1,17 @@
-import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
-import { Send, Image as ImageIcon } from 'lucide-react';
-import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { auth, db, storage } from '../lib/firebase';
+import React, { useState, FormEvent, ChangeEvent, useEffect } from "react";
+import { Send, Image as ImageIcon } from "lucide-react";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+} from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { auth, db, storage } from "../lib/firebase";
 
 const TweetInput: React.FC = () => {
-  const [tweet, setTweet] = useState<string>('');
+  const [tweet, setTweet] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -33,25 +39,30 @@ const TweetInput: React.FC = () => {
     if (auth.currentUser) {
       const { uid, displayName: authDisplayName, email } = auth.currentUser;
       let imageUrl: string | null = null;
-      
+
       try {
         setIsUploading(true);
 
         // Récupérer les informations de l'utilisateur
-        const userDoc = await getDoc(doc(db, 'users', uid));
+        const userDoc = await getDoc(doc(db, "users", uid));
         const userData = userDoc.data();
-        
+
         // Déterminer le displayName à utiliser
-        const displayName = userData?.fullname || authDisplayName || 'Utilisateur';
-        const username = userData?.username || email?.split('@')[0] || 'utilisateur';
+        const displayName =
+          userData?.fullname || authDisplayName || "Utilisateur";
+        const username =
+          userData?.username || email?.split("@")[0] || "utilisateur";
 
         if (imageFile) {
-          const imageRef = ref(storage, `tweets/${uid}/${Date.now()}_${imageFile.name}`);
+          const imageRef = ref(
+            storage,
+            `tweets/${uid}/${Date.now()}_${imageFile.name}`
+          );
           const snapshot = await uploadBytes(imageRef, imageFile);
           imageUrl = await getDownloadURL(snapshot.ref);
         }
 
-        await addDoc(collection(db, 'tweets'), {
+        await addDoc(collection(db, "tweets"), {
           text: tweet,
           createdAt: serverTimestamp(),
           userId: uid,
@@ -59,10 +70,10 @@ const TweetInput: React.FC = () => {
           username: username,
           retweetCount: 0,
           imageUrl: imageUrl,
-          likes: [] // Initialiser un tableau vide pour les likes
+          likes: [], // Initialiser un tableau vide pour les likes
         });
 
-        setTweet('');
+        setTweet("");
         setImageFile(null);
         setIsUploading(false);
       } catch (error) {
@@ -73,15 +84,18 @@ const TweetInput: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 shadow-md rounded-lg mb-4 max-w-xl mx-auto">
+    <form
+      onSubmit={handleSubmit}
+      className="border border-[#2f3336] text-white p-4 shadow-md rounded-lg mb-4  mx-auto"
+    >
       <textarea
         value={tweet}
         onChange={(e) => setTweet(e.target.value)}
         placeholder="Quoi de neuf ?"
-        className="w-full p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
+        className="w-full p-2 border border-[#2f3336] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500  placeholder-gray-500"
         rows={3}
       />
-      
+
       <div className="mt-2 space-y-3">
         <div className="flex items-center">
           <label className="flex items-center gap-2 cursor-pointer text-blue-500 hover:text-blue-600">
