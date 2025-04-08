@@ -8,6 +8,7 @@ import { auth } from "./lib/firebase";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import UsersPage from "./pages/UsersPage";
+import FollowingPage from "./pages/FollowingPage";
 
 function App() {
   const [connectedUser, setConnectedUser] = useState<User | null>(null);
@@ -48,7 +49,11 @@ function App() {
         />
         <Route
           path="/users"
-          element={<UsersPage />} // ⚠️ Supprimer la restriction pour tester
+          element={<UsersPage />}
+        />
+        <Route
+          path="/following"
+          element={connectedUser ? <FollowingPage /> : <Navigate to="/login" />}
         />
       </Routes>
       <Toaster />
