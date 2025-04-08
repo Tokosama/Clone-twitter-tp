@@ -6,16 +6,16 @@ import firebase from 'firebase/app';
 // src/types.ts
 export interface ITweet {
   id: string;
+  uid:string;
   text: string;
-  displayName: string;
-  createdAt: any;
+  displayName?: string;
+  username: string;
   likes: number;
+  createdAt: any;
   imageUrl?: string | null;
   userId: string;
   retweetCount: number;
-  isLiked?: boolean;
   isRetweeted?: boolean;
-  comments?: IComment[];
 }
 
 export interface IComment {
@@ -23,5 +23,11 @@ export interface IComment {
   displayName: string;
   text: string;
   createdAt: any;
+}
+
+export interface IUser {
+  email: string;
+  fullname: string;
+  username: string;
 }
 
