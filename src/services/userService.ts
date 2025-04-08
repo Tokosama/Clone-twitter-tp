@@ -3,23 +3,21 @@ import { User } from "../types";
 import { collection, getDocs, doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
-// Récupère tous les utilisateurs depuis la collection "users"
+// Récupère tous les utilisateurs depuis la collection "Users"
 export const getUsers = async (): Promise<User[]> => {
-  const usersCollectionRef = collection(db, "users");
+  // On utilise "Users" avec un U majuscule, conformément à ta configuration Firestore
+  const usersCollectionRef = collection(db, "Users");
   const querySnapshot = await getDocs(usersCollectionRef);
-
-  const users: User[] = querySnapshot.docs.map((docSnapshot) => {
-    return {
-      id: docSnapshot.id, // L'ID Firestore est une chaîne
-      ...docSnapshot.data(),
-    } as unknown as User;
-  });
+  const users: User[] = querySnapshot.docs.map((docSnapshot) => ({
+    id: docSnapshot.id,
+    ...docSnapshot.data()
+  })) as User[];
   return users;
 };
 
-// Bascule le suivi d'un utilisateur et retourne la liste mise à jour
+// Basculer le statut de follow et renvoyer la liste mise à jour
 export const toggleFollow = async (id: string): Promise<User[]> => {
-  const userDocRef = doc(db, "users", id);
+  const userDocRef = doc(db, "Users", id);
   const userDoc = await getDoc(userDocRef);
 
   if (userDoc.exists()) {

@@ -1,12 +1,13 @@
 // src/components/UserItem.tsx
-import { User } from "../types"; 
+import React from "react";
+import { User } from "../types";
 
 type Props = {
   user: User;
   onToggleFollow: (id: string) => void;
 };
 
-const UserItem = ({ user, onToggleFollow }: Props) => {
+const UserItem: React.FC<Props> = ({ user, onToggleFollow }) => {
   return (
     <div className="flex justify-between items-center border-b py-2">
       <div>
@@ -14,7 +15,7 @@ const UserItem = ({ user, onToggleFollow }: Props) => {
         <p>{user.fullName}</p>
       </div>
       <button
-        onClick={() => onToggleFollow(String(user.id))}
+        onClick={() => onToggleFollow(user.id)}
         className={`btn ${user.isFollowing ? "btn-error" : "btn-primary"} text-white`}
       >
         {user.isFollowing ? "Unfollow" : "Follow"}
