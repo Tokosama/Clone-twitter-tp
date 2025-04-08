@@ -39,6 +39,10 @@ function App() {
           path="/"
           element={connectedUser ? <HomePage /> : <Navigate to="/login" />}
         />
+         <Route
+          path="/users"
+          element={connectedUser ? <UsersPage /> : <Navigate to="/login" />}
+        />
         <Route
           path="/signup"
           element={!connectedUser ? <SignUpPage /> : <Navigate to="/" />}
@@ -47,8 +51,6 @@ function App() {
           path="/login"
           element={!connectedUser ? <LoginPage /> : <Navigate to="/" />}
         />
-        {/* Route vers la page d'affichage des utilisateurs */}
-        <Route path="/users" element={<UsersPage />} />
       </Routes>
       <Toaster />
     </>
