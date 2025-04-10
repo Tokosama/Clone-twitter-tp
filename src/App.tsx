@@ -3,7 +3,7 @@ import { HomePage } from "./pages/HomePage";
 import { SignUpPage } from "./pages/SignupPage";
 import { LoginPage } from "./pages/LoginPage";
 import { Toaster } from "react-hot-toast";
-
+import ProfilePage from "./components/Profile/ProfilePage";
 import { auth } from "./lib/firebase";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
@@ -49,6 +49,10 @@ function App() {
         <Route
           path="/users"
           element={<UsersPage />} // ⚠️ Supprimer la restriction pour tester
+        />
+        <Route
+          path="/profile/:userId"
+          element={<ProfilePage currentUser={connectedUser} />}
         />
       </Routes>
       <Toaster />
