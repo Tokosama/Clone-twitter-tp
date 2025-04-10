@@ -1,5 +1,5 @@
 import UserItem from "./UserItem";
-import { User } from "../types";
+import { User } from "../types/User";
 
 type Props = {
   users: User[];

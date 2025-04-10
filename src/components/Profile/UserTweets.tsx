@@ -1,4 +1,3 @@
-// components/Profile/UserTweets.tsx
 import React, { useState, useEffect } from 'react';
 import { firestore } from '../../lib/firebase';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';

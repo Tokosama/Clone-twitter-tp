@@ -1,13 +1,13 @@
 export interface User {
-    uid: string;
-    displayName: string | null;
-    username?: string;
-    photoURL: string | null;
-    following?: string[]; // Tableau des UIDs des utilisateurs que cet utilisateur suit
-    followers?: string[]; // Tableau des UIDs des utilisateurs qui suivent cet utilisateur
-    // Ajoutez ici d'autres propriétés de votre utilisateur, par exemple :
-    // bio?: string;
-    // location?: string;
-    // website?: string;
-    // createdAt?: number;
-  }
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  username?: string;
+  photoURL: string | null;
+  fullName?: string; // Ajoutez fullName ici
+  followers?: string[];
+  following?: string[];
+  isFollowing?: boolean;
+  id?: number;
+  // ... autres propriétés
+}

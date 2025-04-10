@@ -1,4 +1,4 @@
-import { User } from "../types";
+import { User } from "../types/User";
 
 type Props = {
   user: User;
@@ -13,7 +13,7 @@ const UserItem = ({ user, onToggleFollow }: Props) => {
         <p>{user.fullName}</p>
       </div>
       <button
-        onClick={() => onToggleFollow(user.id)}
+        onClick={() => onToggleFollow(user.id!)}
         className={`btn ${user.isFollowing ? "btn-error" : "btn-primary"} text-white`}
       >
         {user.isFollowing ? "Unfollow" : "Follow"}

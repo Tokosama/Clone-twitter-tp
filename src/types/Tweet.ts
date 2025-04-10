@@ -1,5 +1,6 @@
 export interface Tweet {
     id: string;
+    username: string;
     uid: string;
     content: string;
     timestamp: number;

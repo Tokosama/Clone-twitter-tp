@@ -1,4 +1,3 @@
-// components/Profile/ProfileHeader.tsx
 import React, { useState, useEffect } from 'react';
 import { User } from '../../types/User';
 import { firestore } from '../../lib/firebase';

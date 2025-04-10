@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUsers, toggleFollow } from "../services/userService";
-import { User } from "../types";
+import { User } from "../types/User";
 
 export const useUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -21,8 +21,8 @@ export const useUsers = () => {
 
   const filteredUsers = users.filter(
     (u) =>
-      u.username.toLowerCase().includes(search.toLowerCase()) ||
-      u.fullName.toLowerCase().includes(search.toLowerCase())
+      (u.username?.toLowerCase() ?? "").includes(search.toLowerCase()) ||
+      (u.fullName?.toLowerCase() ?? "").includes(search.toLowerCase())
   );
 
   return { users: filteredUsers, loading, handleToggleFollow, setSearch };
